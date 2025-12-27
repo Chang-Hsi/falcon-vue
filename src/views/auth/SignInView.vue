@@ -20,7 +20,7 @@
 
             <form class="flex w-full flex-col gap-4" @submit.prevent="onSubmit">
               <div class="flex w-full flex-col gap-2">
-                <div class="text-sm font-semibold text-slate-700">帳號</div>
+                <div class="text-sm font-semibold text-slate-700">帳號(0000)</div>
                 <input
                   v-model.trim="account"
                   type="text"
@@ -31,7 +31,7 @@
               </div>
 
               <div class="flex w-full flex-col gap-2">
-                <div class="text-sm font-semibold text-slate-700">密碼</div>
+                <div class="text-sm font-semibold text-slate-700">密碼(0000)</div>
                 <input
                   v-model.trim="password"
                   type="password"
