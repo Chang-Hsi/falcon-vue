@@ -192,7 +192,7 @@
               </div>
 
               <div class="flex w-full rounded-2xl border border-slate-200 bg-white p-3">
-                <EditorContent v-if="editor" :editor="editor" class="w-full" />
+                <EditorContent v-if="editor" :editor1="editor" class="w-full" />
               </div>
             </div>
 
@@ -287,7 +287,8 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { Editor, EditorContent } from "@tiptap/vue-3";
+import { Editor as VueEditor, EditorContent } from "@tiptap/vue-3";
+import type { Editor as CoreEditor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -311,7 +312,11 @@ const linkDraft = ref<string>("");
 const ticketId = computed<string>(() => String(route.params.id || ""));
 const isEdit = computed<boolean>(() => Boolean(ticketId.value));
 
-const editor = ref<Editor | null>(null);
+/**
+ * ✅ 這裡用 CoreEditor 型別，解掉 EditorContent 的 TS 型別衝突
+ *（根本解法仍然是把 @tiptap/* 版本統一）
+ */
+const editor = ref<CoreEditor | null>(null);
 
 const form = reactive<{
   id: string;
@@ -475,7 +480,7 @@ function fillFromTicket(t: any) {
 function initEditor() {
   if (editor.value) return;
 
-  editor.value = new Editor({
+  const instance = new VueEditor({
     extensions: [
       StarterKit.configure({
         bulletList: false,
@@ -495,10 +500,12 @@ function initEditor() {
         class: "w-full min-h-[220px] outline-none text-slate-800",
       },
     },
-    onUpdate: ({ editor }) => {
-      form.htmlContent = editor.getHTML();
+    onUpdate: ({ editor: ed }) => {
+      form.htmlContent = ed.getHTML();
     },
   });
+
+  editor.value = (instance as unknown) as CoreEditor;
 }
 
 onMounted(() => {
@@ -514,7 +521,7 @@ onMounted(() => {
   initEditor();
 
   if (editor.value) {
-    editor.value.commands.setContent(form.htmlContent || "", false);
+    editor.value.commands.setContent(form.htmlContent || "", { emitUpdate: false });
   }
 });
 
@@ -533,7 +540,7 @@ watch(
     fillFromTicket(t);
 
     if (editor.value) {
-      editor.value.commands.setContent(form.htmlContent || "", false);
+      editor.value.commands.setContent(form.htmlContent || "", { emitUpdate: false });
     }
   }
 );
@@ -644,7 +651,6 @@ async function onSave() {
   text-decoration: underline;
 }
 
-/* ✅ Tailwind preflight 會把 ol/ul list-style 清掉，所以要自己補回來 */
 :deep(.ProseMirror ol) {
   list-style: decimal;
   padding-left: 1.25rem;

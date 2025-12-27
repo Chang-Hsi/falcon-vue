@@ -16,6 +16,7 @@
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
     "@tailwindcss/vite": "^4.1.18",
+    "@tiptap/core": "^3.14.0",
     "@tiptap/extension-link": "^3.14.0",
     "@tiptap/extension-placeholder": "^3.14.0",
     "@tiptap/starter-kit": "^3.14.0",

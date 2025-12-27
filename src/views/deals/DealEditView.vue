@@ -564,14 +564,17 @@ function makeBulletListHtml(items: string[]) {
 }
 
 function escapeHtml(s: string) {
-  return s
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+  // ✅ 直接用 replace + regex，不依賴 replaceAll（避免 TS lib 警告）
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
 
+  return String(s || "").replace(/[&<>"']/g, (ch) => map[ch] || ch);
+}
 function htmlToLines(html: string) {
   const doc = new DOMParser().parseFromString(String(html || ""), "text/html");
 
@@ -729,9 +732,10 @@ function resetFormForCreate() {
 
   form.updatedAt = "";
 
-  introEditor.value?.commands.setContent("", false);
-  rulesEditor.value?.commands.setContent("", false);
+  introEditor.value?.commands.setContent("", { emitUpdate: false });
+  rulesEditor.value?.commands.setContent("", { emitUpdate: false });
 }
+
 
 watch(
   () => routeId.value,

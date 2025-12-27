@@ -511,11 +511,22 @@ export const useAdminThemeStore = defineStore("adminThemeStore", {
 
     resequenceOrders() {
       const sorted = sortByOrder(this.themes);
+
       sorted.forEach((t, i) => {
         const idx = this.themes.findIndex((x) => x.id === t.id);
-        if (idx >= 0) {
-          this.themes[idx] = { ...this.themes[idx], order: i + 1, updatedAt: nowText() };
-        }
+        if (idx < 0) return;
+
+        const prev = this.themes[idx];
+        if (!prev) return; // ✅ 修正：索引取值可能是 undefined（noUncheckedIndexedAccess）
+
+        const next: AdminTheme = {
+          ...prev,
+          order: i + 1,
+          updatedAt: nowText(),
+        };
+
+        // ✅ 用 splice 明確替換，型別維持為 AdminTheme
+        this.themes.splice(idx, 1, next);
       });
     },
 
@@ -591,6 +602,8 @@ export const useAdminThemeStore = defineStore("adminThemeStore", {
       if (idx < 0) return;
 
       const t = this.themes[idx];
+      if (!t) return; // ✅ 修正：t 可能是 undefined
+
       const nextStatus: ItemStatus = t.status === "enabled" ? "disabled" : "enabled";
       this.updateTheme(target, { status: nextStatus });
     },

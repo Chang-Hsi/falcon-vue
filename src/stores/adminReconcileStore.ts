@@ -34,7 +34,7 @@ export type ReconcileRow = {
 };
 
 type SortDir = "asc" | "desc" | "";
-type SortKey = "date" | "amount" | "fee" | "net" | "status" | "brand" | "payment" | "orderNo" | "";
+export type SortKey = "date" | "amount" | "fee" | "net" | "status" | "brand" | "payment" | "orderNo" | "";
 
 type Filters = {
   dateFrom: string; // YYYY-MM-DD

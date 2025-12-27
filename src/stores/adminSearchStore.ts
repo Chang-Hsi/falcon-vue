@@ -321,11 +321,14 @@ function makeMockLogsForMonths(params: {
 
   function pick<T>(arr: T[]): T {
     if (!arr.length) return arr[0] as T;
+
     const idx = Math.floor(rng() * arr.length);
     const v = arr[idx];
-    return v === undefined ? arr[0] : v;
-  }
 
+    // ✅ 最小改動：加上 as T，讓 TS 不再把它當成 T | undefined
+    return (v === undefined ? arr[0] : v) as T;
+  }
+  
   function makeAt(month: number, day: number, hour = 12, minute = 0): string {
     // ✅ 用「中午」避免時區造成跨日/月
     return new Date(year, month - 1, day, hour, minute, 0).toISOString();

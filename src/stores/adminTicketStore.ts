@@ -26,6 +26,8 @@ export type AdminTicket = {
   updatedAt: string; // YYYY-MM-DD HH:mm
 };
 
+export type TicketCategory = { id: string; label: string };
+
 type BrandOption = { id: string; label: string };
 
 type Filters = {
@@ -91,7 +93,6 @@ function parseYMD(ymd: string) {
 }
 
 function normalizeStatusOrder(s: TicketStatus) {
-  // draft 最前，enabled 次之，disabled 最後（你也可以反過來）
   if (s === "draft") return 0;
   if (s === "enabled") return 1;
   return 2;
@@ -108,6 +109,16 @@ export const useAdminTicketStore = defineStore("adminTicketStore", {
       { id: "carrefour", label: "家樂福" },
     ];
 
+    // ✅ 補上 categories（你元件正在用）
+    const categories: TicketCategory[] = [
+      { id: "food", label: "餐飲" },
+      { id: "movie", label: "電影娛樂" },
+      { id: "shopping", label: "購物" },
+      { id: "beauty", label: "美妝保養" },
+      { id: "health", label: "健康/SPA" },
+      { id: "supermarket", label: "量販超市" },
+    ];
+
     const baseTickets = [
       {
         id: "subway-xinyi",
@@ -122,14 +133,16 @@ export const useAdminTicketStore = defineStore("adminTicketStore", {
         title: "星巴克南京店",
         subtitle: "中杯咖啡兌換券",
         points: 280,
-        imageUrl: "https://images.unsplash.com/photo-1581470762681-018024ce84a7?w=1200&h=1200&fit=crop&q=90",
+        imageUrl:
+          "https://images.unsplash.com/photo-1581470762681-018024ce84a7?w=1200&h=1200&fit=crop&q=90",
       },
       {
         id: "showtime-xinyi",
         title: "威秀影城信義店",
         subtitle: "電影票兌換券",
         points: 420,
-        imageUrl: "https://images.unsplash.com/photo-1751823886813-0cfc86cb9478?w=1200&h=1200&fit=crop&q=90",
+        imageUrl:
+          "https://images.unsplash.com/photo-1751823886813-0cfc86cb9478?w=1200&h=1200&fit=crop&q=90",
       },
       {
         id: "cosmed-xiaokao",
@@ -144,7 +157,8 @@ export const useAdminTicketStore = defineStore("adminTicketStore", {
         title: "SPA會館大安店",
         subtitle: "按摩體驗券",
         points: 500,
-        imageUrl: "https://images.unsplash.com/photo-1757689314932-bec6e9c39e51?w=1200&h=1200&fit=crop&q=90",
+        imageUrl:
+          "https://images.unsplash.com/photo-1757689314932-bec6e9c39e51?w=1200&h=1200&fit=crop&q=90",
       },
       {
         id: "carrefour-guilin",
@@ -283,6 +297,7 @@ export const useAdminTicketStore = defineStore("adminTicketStore", {
     return {
       items,
       brands,
+      categories, // ✅ 回傳 categories
       todayYMD,
 
       filters: {
@@ -310,6 +325,13 @@ export const useAdminTicketStore = defineStore("adminTicketStore", {
     brandLabelMap(state) {
       const map: Record<string, string> = {};
       for (const b of state.brands) map[b.id] = b.label;
+      return map;
+    },
+
+    // ✅ 補上 categoryLabelMap（你元件正在用）
+    categoryLabelMap(state) {
+      const map: Record<string, string> = {};
+      for (const c of state.categories) map[c.id] = c.label;
       return map;
     },
 
